@@ -15,7 +15,8 @@ def find_publications(idHal, field, increment=0):
             'openAccess_bool,' \
             'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
             'isbn_s,' \
-            'publicationDateY_i'
+            'publicationDateY_i,' \
+            'defenseDate_tdate'
 
     req = requests.get(
         'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal) + '&fl=' + flags + '&start=' + str(
@@ -50,5 +51,22 @@ def find_publications(idHal, field, increment=0):
 # pour lab IMSIC
 articles = find_publications('527028', 'structId_i')
 
+hceres_art = []
+hceres_book = []
+hceres_conf = []
+hceres_hdr = []
+
 for article in articles:
-    print(article)
+
+    # colloque et posters
+    if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
+        hceres_conf.append(article)
+    # art
+    if article["docType_s"] == "ART":
+        hceres_art.append(article)
+    # ouvrages, chapitres d'ouvrages et directions d'ouvrages
+    if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
+        hceres_book.append(article)
+    # hdr
+    if article["docType_s"] == "HDR":
+        hceres_art.append(article)

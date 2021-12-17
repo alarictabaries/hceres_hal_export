@@ -16,6 +16,7 @@
 - serie_s : titre du volume
 - page_s : numéro des pages
 - issue_s : numéro de revue
+- defenseDate_tdate : date soutenance
 
 ### Données manquantes
 
@@ -28,3 +29,8 @@
 - nom -> majuscule
 - aggréger dates début/fin colloque
 - trier par type d'ouvrage
+
+### Questions
+
+Ouvrages comprend : chapître d'ouvrage, direction d'ouvrage ?
+Colloques : comprend les posters ?
