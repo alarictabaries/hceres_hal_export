@@ -74,11 +74,11 @@ for article in articles:
     if 'openAccess_bool' in article:
         print(article['openAccess_bool'])
         if article['openAccess_bool']:
-            article["openAccess_bool_s"] = "OUI"
+            article["openAccess_bool_s"] = "O"
         else:
-            article["openAccess_bool_s"] = "NON"
+            article["openAccess_bool_s"] = "N"
     else:
-        article["openAccess_bool_s"] = "NON"
+        article["openAccess_bool_s"] = "N"
 
     if 'conferenceStartDate_tdate' in article:
         tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
