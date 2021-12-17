@@ -70,6 +70,8 @@ for article in articles:
         else:
             article["volFull_s"] = article["serie_s"][0]
 
+    if "journalTitle_s" not in article:
+        article["journalTitle_s"] = ""
 
     if 'openAccess_bool' in article:
         print(article['openAccess_bool'])
@@ -82,8 +84,17 @@ for article in articles:
 
     if 'conferenceStartDate_tdate' in article:
         tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
-        tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
-        article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+        if 'conferenceEndDate_tdate' in article:
+            tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
+            article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+        else:
+            article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0]
+    else:
+        if 'conferenceEndDate_tdate' in article:
+            article["conferenceDate_s"] = tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+
+    if "defenseDate_tdate" in article:
+        article["defenseDate_tdate_s"] = article["defenseDate_tdate"][0:9]
 
     article["title_s"] = article["title_s"][0]
 
@@ -104,11 +115,19 @@ for article in articles:
     # ouvrages, chapitres d'ouvrages et directions d'ouvrages
     if article["docType_s"] == "COUV" or article["docType_s"] == "DOUV" or article["docType_s"] == "OUV":
         hceres_book.append(article)
-    # hdr
-    if article["docType_s"] == "HDR":
-        hceres_hdr.append(article)
 
 
 art_df = pd.DataFrame(hceres_art)
 art_df = art_df.sort_values(by=['publicationDateY_i'])
-art_df[['authfullName_s','title_s','journalTitle_s','volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s', 'openAccess_bool_s']].to_excel("output.xlsx", index=False, engine='xlsxwriter')
+
+book_df = pd.DataFrame(hceres_book)
+book_df = book_df.sort_values(by=['publicationDateY_i'])
+
+conf_df = pd.DataFrame(hceres_conf)
+conf_df = conf_df.sort_values(by=['publicationDateY_i'])
+
+writer = pd.ExcelWriter("output.xlsx", engine='openpyxl')
+art_df[['authfullName_s','title_s','journalTitle_s','volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s', 'openAccess_bool_s']].to_excel(writer, 'ART', index=False)
+book_df[['authfullName_s','title_s','journalTitle_s','volFull_s', 'page_s', 'publicationDateY_i', 'isbn_s', 'openAccess_bool_s']].to_excel(writer, 'OUV', index=False)
+conf_df[['authfullName_s','title_s','journalTitle_s','volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s', 'conferenceTitle_s', 'conferenceDate_s', 'openAccess_bool_s']].to_excel(writer, 'CONF', index=False)
+writer.save()
