@@ -15,7 +15,7 @@ def find_publications(idHal, field, increment=0):
     flags = 'halId_s,' \
             'authFirstName_s,authLastName_s,' \
             'docType_s,doiId_s,' \
-            'bookTitle_s,title_s,journalTitle_s,volume_s,serie_s,page_s,issue_s' \
+            'bookTitle_s,title_s,journalTitle_s,volume_s,serie_s,page_s,issue_s,' \
             'openAccess_bool,' \
             'conferenceTitle_s,conferenceStartDate_tdate,conferenceEndDate_tdate,' \
             'isbn_s,' \
@@ -66,7 +66,7 @@ for article in articles:
 
     if "serie_s" in article:
         if "issue_s" in article:
-            article["volFull_s"] = article["serie_s"][0] + " " + article["issue_s"]
+            article["volFull_s"] = article["serie_s"][0] + " " + article["issue_s"][0]
         else:
             article["volFull_s"] = article["serie_s"][0]
 
@@ -78,8 +78,6 @@ for article in articles:
             article["openAccess_bool_s"] = "O"
         else:
             article["openAccess_bool_s"] = "N"
-    else:
-        article["openAccess_bool_s"] = "N"
 
     if 'conferenceStartDate_tdate' in article:
         tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
