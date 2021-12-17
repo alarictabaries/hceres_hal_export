@@ -74,8 +74,7 @@ for article in articles:
         article["journalTitle_s"] = ""
 
     if 'openAccess_bool' in article:
-        print(article['openAccess_bool'])
-        if article['openAccess_bool']:
+        if article['openAccess_bool'] == "true" or article['openAccess_bool'] == True:
             article["openAccess_bool_s"] = "O"
         else:
             article["openAccess_bool_s"] = "N"
