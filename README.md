@@ -24,12 +24,6 @@
 - doctorant est co-auteur de l'article
 - publication en premier, dernier ou corresponding auteur
 
-### Traitements (WIP)
-
-- nom -> majuscule
-- aggréger dates début/fin colloque
-- trier par type d'ouvrage
-
 ### Questions
 
 Ouvrages comprend : chapître d'ouvrage, direction d'ouvrage ?

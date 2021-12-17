@@ -1,5 +1,9 @@
 import requests
-import csv
+import pandas as pd
+from openpyxl import Workbook
+from openpyxl.cell.cell import WriteOnlyCell
+from openpyxl.utils.dataframe import dataframe_to_rows
+
 
 def find_publications(idHal, field, increment=0):
     articles = []
@@ -20,7 +24,7 @@ def find_publications(idHal, field, increment=0):
 
     req = requests.get(
         'http://api.archives-ouvertes.fr/search/?q=' + field + ':' + str(idHal) + '&fl=' + flags + '&start=' + str(
-            increment))
+            increment) + '&fq=publicationDateY_i:[2016 TO *]')
 
     if req.status_code == 200:
         data = req.json()
@@ -58,9 +62,42 @@ hceres_hdr = []
 
 for article in articles:
 
+    article["authfullName_s"] = ""
+
+    if "serie_s" in article:
+        if "issue_s" in article:
+            article["volFull_s"] = article["serie_s"][0] + " " + article["issue_s"]
+        else:
+            article["volFull_s"] = article["serie_s"][0]
+
+
+    if 'openAccess_bool' in article:
+        print(article['openAccess_bool'])
+        if article['openAccess_bool']:
+            article["openAccess_bool_s"] = "OUI"
+        else:
+            article["openAccess_bool_s"] = "NON"
+    else:
+        article["openAccess_bool_s"] = "NON"
+
+    if 'conferenceStartDate_tdate' in article:
+        tmp_start = article["conferenceStartDate_tdate"][0:9].split("-")
+        tmp_end = article["conferenceEndDate_tdate"][0:9].split("-")
+        article["conferenceDate_s"] = tmp_start[2] + "-" + tmp_start[1] + "-" + tmp_start[0] + ", " + tmp_end[2] + "-" + tmp_end[1] + "-" + tmp_end[0]
+
+    article["title_s"] = article["title_s"][0]
+
+    for i in range(len(article["authFirstName_s"])):
+        article["authfullName_s"] += article["authLastName_s"][i].upper() + " " + article["authFirstName_s"][i] + ", "
+
+    article["authfullName_s"] = article["authfullName_s"][:-2]
+
+    print(article["authfullName_s"])
+
     # colloque et posters
     if article["docType_s"] == "COMM" or article["docType_s"] == "POSTER":
         hceres_conf.append(article)
+
     # art
     if article["docType_s"] == "ART":
         hceres_art.append(article)
@@ -69,4 +106,9 @@ for article in articles:
         hceres_book.append(article)
     # hdr
     if article["docType_s"] == "HDR":
-        hceres_art.append(article)
+        hceres_hdr.append(article)
+
+
+art_df = pd.DataFrame(hceres_art)
+art_df = art_df.sort_values(by=['publicationDateY_i'])
+art_df[['authfullName_s','title_s','journalTitle_s','volFull_s', 'page_s', 'publicationDateY_i', 'doiId_s', 'openAccess_bool_s']].to_excel("output.xlsx", index=False, engine='xlsxwriter')
